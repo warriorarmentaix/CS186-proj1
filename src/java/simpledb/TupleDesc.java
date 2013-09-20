@@ -41,7 +41,11 @@ public class TupleDesc implements Serializable {
      *        that are included in this TupleDesc
      * */
     public Iterator<TDItem> iterator() {
-        return null;
+        ArrayList<TDItem> td_items = new ArrayList<TDItem>();
+        for (int i = 0; i < numFields(); i ++) {
+            td_items.add(new TDItem(types[i], names[i]));
+        }
+        return td_items.listIterator();
     }
 
     private static final long serialVersionUID = 1L;
@@ -60,10 +64,24 @@ public class TupleDesc implements Serializable {
      *            be null.
      */
     public TupleDesc(Type[] typeAr, String[] fieldAr) {
-        this.types = typeAr;
-        this.names = fieldAr;
-        if (types.length != names.length) {
-            System.out.println("ARRAY LENGTHS DO NOT MATCH");
+        if (fieldAr == null) {
+            this.types = typeAr;
+            this.names = new String[types.length];
+            for (int i = 0; i < typeAr.length; i++) {
+                this.names[i] = "";
+            }
+        } else if (fieldAr.length < typeAr.length) {
+            this.types = typeAr;
+            this.names = new String[types.length];
+            for (int i = 0; i < fieldAr.length; i++) {
+                this.names[i] = fieldAr[i];
+            }
+            for (int i = fieldAr.length; i < typeAr.length; i++) {
+                this.names[i] = "";
+            }
+        } else {
+            this.types = typeAr;
+            this.names = fieldAr;
         }
     }
 
@@ -79,7 +97,7 @@ public class TupleDesc implements Serializable {
         this.types = typeAr;
         this.names = new String[types.length];
         for (int i = 0; i < names.length; i++) {
-            names[i] = "";
+            this.names[i] = "";
         }
     }
 
