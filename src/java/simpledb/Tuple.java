@@ -3,7 +3,6 @@ package simpledb;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.ArrayList;
 
 /**
  * Tuple maintains information about the contents of a tuple. Tuples have a
