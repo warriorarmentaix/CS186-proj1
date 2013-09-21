@@ -300,7 +300,8 @@ public class HeapPage implements Page {
         int byteIndex = i / 8;
         int bitOffset = i % 8;
         byte headerByte = header[byteIndex];
-        return (headerByte & bitOffset) == 1;
+        int mask = 1 << bitOffset;
+        return (headerByte & mask) > 0;
     }
 
     /**
@@ -322,9 +323,6 @@ public class HeapPage implements Page {
                 t.add(tuples[i]);
             }
         }
-        System.out.println(tuples.length);
-        System.out.println(t.size());
-        System.out.println(getNumEmptySlots());
         return t.listIterator();
     }
 
