@@ -76,9 +76,7 @@ public class HeapPage implements Page {
      * @return the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
      */
     private int getHeaderSize() {        
-        return (int) (Math.ceil(getNumTuples() / 8.0));
-
-                 
+        return (int) (Math.ceil(getNumTuples() / 8.0));                
     }
     
     /** Return a view of this page before it was modified
@@ -271,16 +269,19 @@ public class HeapPage implements Page {
      * Returns the number of empty slots on this page.
      */
     public int getNumEmptySlots() {
-        int numEmptySlots = 0; 
+        int numEmptySlots = 0;
+        int full, mask;
+        byte b;
+
         for (int i = 0; i < header.length; i++) {
-            byte b = header[i];
-            int mask = 1;
+            b = header[i];
+            mask = 1;
             for (int j = 0; j < 8; j++) {
                 if (i * 8 + j >= numSlots) {
                     return numEmptySlots;
                 }
-                int full = b & mask;
-                //System.out.println(full);
+                full = b & mask;
+
                 if (full == 0) {
                     numEmptySlots++;
                 }
@@ -297,10 +298,12 @@ public class HeapPage implements Page {
         if (i >= numSlots) {
             return false;
         }
+
         int byteIndex = i / 8;
         int bitOffset = i % 8;
         byte headerByte = header[byteIndex];
         int mask = 1 << bitOffset;
+        
         return (headerByte & mask) > 0;
     }
 
