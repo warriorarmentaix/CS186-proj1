@@ -63,7 +63,20 @@ public class HeapFile implements DbFile {
 
     // see DbFile.java for javadocs
     public Page readPage(PageId pid) {
-        // some code goes here
+        // bytes to skip
+        int offset = pid.pageNumber() * BufferPool.PAGE_SIZE;
+        byte[] page = new byte[BufferPool.PAGE_SIZE];
+
+        try {
+            RandomAccessFile raf = new RandomAccessFile(file, "r");
+            raf.skipBytes(offset);
+            raf.read(page);
+            return new HeapPage((HeapPageId) pid, page);
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+
         return null;
     }
 
@@ -98,9 +111,34 @@ public class HeapFile implements DbFile {
 
     // see DbFile.java for javadocs
     public DbFileIterator iterator(TransactionId tid) {
-        // some code goes here
-        return null;
+
     }
 
+    /*
+    OKAY HENRY IGNORE ALL THIS ASDFASDFASDF WE HAVE TO RETURN DbFileIterator NOT Iterator<Tuple>
+    public DbFileIterator iterator(TransactionId tid) {
+        // each page has iterator over tuples already, so get each pages iterator and add tuples?
+        ArrayList<Tuple> tuples = new ArrayList<Tuple>();
+        Iterator<Tuple> pageIterator;
+
+        for (int i = 0; i < this.numPages(); i++) {
+            pageIterator = pageIterator(tid, i);
+            //for (Tuple t : pageIterator) {
+            //    tuples.add(t);
+            //}
+            while (pageIterator.hasNext()) {
+                tuples.add(pageIterator.next());
+            }
+        }
+
+        return tuples.iterator();
+    }
+
+    private Iterator<Tuple> pageIterator(TransactionId tid, int pageNumber) {
+        HeapPageId pid = new HeapPageId(this.getId(), pageNumber);
+        HeapPage page = (HeapPage) BufferPool.getPage(tid, pid, null);
+        return page.iterator();
+    }
+    */
 }
 
