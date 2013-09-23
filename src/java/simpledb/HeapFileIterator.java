@@ -59,6 +59,9 @@ public class HeapFileIterator implements DbFileIterator {
      * @throws NoSuchElementException if there are no more tuples
      */
     public Tuple next() throws DbException, TransactionAbortedException, NoSuchElementException {
+        if (!open) {
+            throw new NoSuchElementException();
+        }
         if (hasNext()) {
             return currentPageIter.next();
         }
@@ -70,8 +73,7 @@ public class HeapFileIterator implements DbFileIterator {
      * @throws DbException When rewind is unsupported.
      */
     public void rewind() throws DbException, TransactionAbortedException {
-        //currentPage = 0;
-        //setCurrentIterator();
+        close();
         open();
     }
 

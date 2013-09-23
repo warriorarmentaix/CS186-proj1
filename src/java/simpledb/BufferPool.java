@@ -56,13 +56,10 @@ public class BufferPool {
             }
         }
         if (pages.size() >= numPages) {
-            throw 
+            throw new DbException("Buffer pool is full");
         }
         DbFile file = Database.getCatalog().getDbFile(pid.getTableId());
         Page page = file.readPage(pid);
-        if (pages.size() >= numPages) {
-            evictPage();
-        }
         pages.add(page);
         return page;
     }

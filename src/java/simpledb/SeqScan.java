@@ -14,6 +14,8 @@ public class SeqScan implements DbIterator {
     private TransactionId tid;
     private int tableid;
     private String tableAlias;
+    private boolean open;
+    private DbFileIterator iter;
 
     /**
      * Creates a sequential scan over the specified table as a part of the
@@ -35,6 +37,8 @@ public class SeqScan implements DbIterator {
         this.tid = tid;
         this.tableid = tableid;
         this.tableAlias = tableAlias;
+        this.open = false;
+        this.iter = Database.getCatalog().getDbFile(this.tableid).iterator(this.tid);
     }
 
     /**
@@ -68,6 +72,8 @@ public class SeqScan implements DbIterator {
     public void reset(int tableid, String tableAlias) {
         this.tableid = tableid;
         this.tableAlias = tableAlias;
+        this.iter = null;
+        this.open = false;
     }
 
     public SeqScan(TransactionId tid, int tableid) {
@@ -75,7 +81,11 @@ public class SeqScan implements DbIterator {
     }
 
     public void open() throws DbException, TransactionAbortedException {
-        // some code goes here
+        if (this.open) {
+            throw new DbException("SeqScan is already open");
+        }
+        iter.open();
+        this.open = true;
     }
 
     /**
@@ -88,27 +98,44 @@ public class SeqScan implements DbIterator {
      *         prefixed with the tableAlias string from the constructor.
      */
     public TupleDesc getTupleDesc() {
-        // some code goes here
-        return null;
+        TupleDesc td = Database.getCatalog().getDbFile(this.tableid).getTupleDesc();
+        Type[] types = new Type[td.numFields()];
+        String[] names = new String[td.numFields()];
+        for (int i = 0; i < td.numFields(); i ++) {
+            String n = td.getFieldName(i);
+            Type t = td.getFieldType(i);
+            names[i] = this.tableAlias + "." + n;
+            types[i] = t;
+        }
+        return new TupleDesc(types, names);
     }
 
     public boolean hasNext() throws TransactionAbortedException, DbException {
-        // some code goes here
-        return false;
+        if (this.open != true) {
+            throw new DbException("SeqScan is not open");
+        }
+        return iter.hasNext();
     }
 
     public Tuple next() throws NoSuchElementException,
             TransactionAbortedException, DbException {
-        // some code goes here
-        return null;
+        if (this.open != true) {
+            throw new DbException("SeqScan is not open");
+        }
+        return iter.next();
     }
 
     public void close() {
-        // some code goes here
+        this.iter.close();
+        this.iter = null;
+        this.open = false;
     }
 
     public void rewind() throws DbException, NoSuchElementException,
             TransactionAbortedException {
-        // some code goes here
+        if (this.open != true) {
+            throw new DbException("SeqScan is not open");
+        }
+        iter.rewind();
     }
 }
