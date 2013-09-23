@@ -64,24 +64,23 @@ public class TupleDesc implements Serializable {
      *            be null.
      */
     public TupleDesc(Type[] typeAr, String[] fieldAr) {
+        this.types = typeAr;
+        this.names = new String[types.length];
         if (fieldAr == null) {
-            this.types = typeAr;
-            this.names = new String[types.length];
             for (int i = 0; i < typeAr.length; i++) {
-                this.names[i] = "null";
-            }
-        } else if (fieldAr.length < typeAr.length) {
-            this.types = typeAr;
-            this.names = new String[types.length];
-            for (int i = 0; i < fieldAr.length; i++) {
-                this.names[i] = fieldAr[i];
-            }
-            for (int i = fieldAr.length; i < typeAr.length; i++) {
-                this.names[i] = "null";
+                this.names[i] = "";
             }
         } else {
-            this.types = typeAr;
-            this.names = fieldAr;
+            for (int i = 0; i < fieldAr.length; i++) {
+                if (fieldAr[i] == null) {
+                    this.names[i] = "";
+                } else {
+                    this.names[i] = fieldAr[i];
+                }
+            }
+            for (int i = fieldAr.length; i < typeAr.length; i++) {
+                this.names[i] = "";
+            }
         }
     }
 
@@ -97,7 +96,7 @@ public class TupleDesc implements Serializable {
         this.types = typeAr;
         this.names = new String[types.length];
         for (int i = 0; i < names.length; i++) {
-            this.names[i] = "null";
+            this.names[i] = "";
         }
     }
 
