@@ -30,6 +30,7 @@ public class BufferPool {
      */
     public BufferPool(int numPages) {
         this.numPages = numPages;
+        this.pages = new ArrayList<Page>();
     }
 
     /**
