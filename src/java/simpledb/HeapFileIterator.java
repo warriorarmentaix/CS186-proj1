@@ -18,7 +18,9 @@ public class HeapFileIterator implements DbFileIterator {
     }
 
     private void setCurrentIterator() throws DbException, TransactionAbortedException {
-        HeapPage page = (HeapPage) Database.getBufferPool().getPage(tid, new HeapPageId(file.getId(), currentPage), null);
+        //HeapPage page = (HeapPage) Database.getBufferPool().getPage(tid, new HeapPageId(file.getId(), currentPage), null);
+        HeapPageId pid = new HeapPageId(file.getId(), currentPage);
+        HeapPage page = (HeapPage) Database.getBufferPool().getPage(tid, pid, null);
         currentPageIter = page.iterator();
     }
 
@@ -78,5 +80,6 @@ public class HeapFileIterator implements DbFileIterator {
      */
     public void close() {
         open = false;
+        currentPageIter = null;
     }
 } 
