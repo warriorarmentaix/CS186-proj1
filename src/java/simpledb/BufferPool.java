@@ -54,6 +54,9 @@ public class BufferPool {
                 return page;
             }
         }
+        if (pages.size() >= numPages) {
+            throw 
+        }
         DbFile file = Database.getCatalog().getDbFile(pid.getTableId());
         Page page = file.readPage(pid);
         if (pages.size() >= numPages) {
