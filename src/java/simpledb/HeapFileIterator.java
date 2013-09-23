@@ -5,33 +5,21 @@ import java.util.*;
 public class HeapFileIterator implements DbFileIterator {
     private TransactionId tid;
     private HeapFile file;
-    private ArrayList<Tuple> tuples;
-    private int index;
+    
     private boolean open;
+    private int currentPage;
+    private Iterator<Tuple> currentPageIter;
+
 
     public HeapFileIterator(TransactionId tid, HeapFile f) {
-        // DON'T THROW EXCEPTIONS IN CONSTRUCTOR IT MAKES EVERYTHING SCARY AND BAD
+        // DON'T LET CONSTRUCTOR DO ANYTHING THAT THROWS EXCEPTION OR MUCH SCARY
         this.tid = tid;
         this.file = f;
-        tuples = new ArrayList<Tuple>();
-        index = 0;
-        open = false;
     }
 
-    private void initTuples() throws DbException, TransactionAbortedException {
-        Iterator<Tuple> iter;
-        HeapPageId pid;
-        HeapPage page;
-
-        for (int i = 0; i < file.numPages(); i++) {
-            pid = new HeapPageId(file.getId(), i);
-            page = (HeapPage) Database.getBufferPool().getPage(tid, pid, Permissions.READ_ONLY);
-            iter = page.iterator();
-
-            while (iter.hasNext()) {
-                tuples.add(iter.next());
-            }
-        }
+    private void setCurrentIterator() throws DbException, TransactionAbortedException {
+        HeapPage page = (HeapPage) Database.getBufferPool().getPage(tid, new HeapPageId(file.getId(), currentPage), null);
+        currentPageIter = page.iterator();
     }
 
     /**
@@ -39,14 +27,26 @@ public class HeapFileIterator implements DbFileIterator {
      * @throws DbException when there are problems opening/accessing the database.
      */
     public void open() throws DbException, TransactionAbortedException {
-        initTuples();
-        index = 0;
         open = true;
+        currentPage = 0;
+        setCurrentIterator();
     }
 
     /** @return true if there are more tuples available. */
     public boolean hasNext() throws DbException, TransactionAbortedException {
-        return (open && (index < tuples.size()));
+        if (open) {
+            if (currentPageIter.hasNext()) {
+                return true;
+            }
+            else if (currentPage + 1 < file.numPages()) {
+                currentPage++;
+                setCurrentIterator();
+                if (currentPageIter.hasNext()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -58,13 +58,9 @@ public class HeapFileIterator implements DbFileIterator {
      */
     public Tuple next() throws DbException, TransactionAbortedException, NoSuchElementException {
         if (hasNext()) {
-            Tuple tup = tuples.get(index);
-            index++;
-            return tuples.get(index);
+            return currentPageIter.next();
         }
-        else {
-            throw new NoSuchElementException();
-        }
+        throw new NoSuchElementException();
     }
 
     /**
@@ -72,6 +68,8 @@ public class HeapFileIterator implements DbFileIterator {
      * @throws DbException When rewind is unsupported.
      */
     public void rewind() throws DbException, TransactionAbortedException {
+        //currentPage = 0;
+        //setCurrentIterator();
         open();
     }
 

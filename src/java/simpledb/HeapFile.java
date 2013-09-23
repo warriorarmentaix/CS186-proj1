@@ -111,13 +111,7 @@ public class HeapFile implements DbFile {
 
     // see DbFile.java for javadocs
     public DbFileIterator iterator(TransactionId tid) {
-        try {
-            return new HeapFileIterator(tid, this);
-        }
-        catch (Exception e) {
-            System.out.println(e);
-            return null;
-        }
+        return new HeapFileIterator(tid, this);
     }
 
     /*
