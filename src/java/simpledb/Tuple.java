@@ -3,6 +3,7 @@ package simpledb;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.ArrayList;
 
 /**
  * Tuple maintains information about the contents of a tuple. Tuples have a
@@ -64,12 +65,7 @@ public class Tuple implements Serializable {
      *            new value for the field.
      */
     public void setField(int i, Field f) {
-        if (i < fields.length) {
-            fields[i] = f;
-        }
-        else {
-            System.out.println("HEY MAN INDEX NOT VALID");
-        }
+        fields[i] = f;
     }
 
     /**
@@ -79,13 +75,7 @@ public class Tuple implements Serializable {
      *            field index to return. Must be a valid index.
      */
     public Field getField(int i) {
-        if (i < fields.length) {
-            return fields[i];
-        }
-        else {
-            System.out.println("HEY MAN INDEX NOT VALID");
-            return null;
-        }
+        return fields[i];
     }
 
     /**
@@ -97,8 +87,12 @@ public class Tuple implements Serializable {
      * where \t is any whitespace, except newline, and \n is a newline
      */
     public String toString() {
-        // some code goes here
-        throw new UnsupportedOperationException("Implement this");
+        String str = "";
+        for (int i = 0; i < fields.length - 1; i++) {
+            str = str + fields[i].toString() + "\t";
+        }
+        str  = str + fields[fields.length - 1].toString() + "\n";
+        return str;
     }
     
     /**
@@ -107,7 +101,7 @@ public class Tuple implements Serializable {
      * */
     public Iterator<Field> fields()
     {
-        // some code goes here
-        return null;
+        ArrayList<Field> l = new ArrayList<Field>(Arrays.asList(fields));
+        return l.listIterator();
     }
 }

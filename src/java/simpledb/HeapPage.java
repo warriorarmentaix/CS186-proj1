@@ -326,7 +326,7 @@ public class HeapPage implements Page {
                 t.add(tuples[i]);
             }
         }
-        return t.listIterator();
+        return new HeapPageIterator(t); 
     }
 
 }
