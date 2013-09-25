@@ -11,7 +11,7 @@ Changes in API
 
 Missing or Incomplete elements of our code
 
-	FILL THIS IN
+	n/a
 
 Who worked on what
 	Dylan (cs186-nn) initially worked on TupleDesc, Tuple, Catalog, BufferPool, HeapPageId, RecordId, and HeapFile
@@ -27,4 +27,7 @@ Confusing things
 	(and Piazza post 80) ,but when we got to SeqScan.java, it seemed like instead of naming fields "" when a null string was given for
 	the name, it wanted us to return the string "null". We asked a question on Piazza, but the response just told us to return "", so 
 	that's what we did. In either case, we passed every test we tried.
->>>>>>> 4a7e59ca9f6c877a8afb5dd87752a0a8dd49a7e3
+
+	If mismatching arrays are input to the constructor of TupleDesc, we weren't sure on the correct procedure. We ended up truncating
+	the names array if it was longer, and padded the names array if the field array was longer. Later, an instructor answered a post
+	on Piazza saying that we could assume they were the same length.
