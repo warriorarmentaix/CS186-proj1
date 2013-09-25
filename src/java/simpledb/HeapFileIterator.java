@@ -23,7 +23,7 @@ public class HeapFileIterator implements DbFileIterator {
         HeapPage page = (HeapPage) Database.getBufferPool().getPage(tid, pid, null);
         currentPageIter = page.iterator();
     }
-
+    
     /**
      * Opens the iterator
      * @throws DbException when there are problems opening/accessing the database.

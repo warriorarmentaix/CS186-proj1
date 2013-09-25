@@ -64,11 +64,10 @@ public class Tuple implements Serializable {
      *            new value for the field.
      */
     public void setField(int i, Field f) {
-        if (i < fields.length) {
+        if (!(f.getType().equals(getField(i).getType()))){
+            throw new RuntimeException();
+        } else {
             fields[i] = f;
-        }
-        else {
-            System.out.println("HEY MAN INDEX NOT VALID");
         }
     }
 
@@ -79,13 +78,7 @@ public class Tuple implements Serializable {
      *            field index to return. Must be a valid index.
      */
     public Field getField(int i) {
-        if (i < fields.length) {
-            return fields[i];
-        }
-        else {
-            System.out.println("HEY MAN INDEX NOT VALID");
-            return null;
-        }
+        return fields[i];
     }
 
     /**
