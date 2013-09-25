@@ -41,16 +41,11 @@ public class TupleDesc implements Serializable {
      *        that are included in this TupleDesc
      * */
     public Iterator<TDItem> iterator() {
-        ArrayList<TDItem> td_items = new ArrayList<TDItem>();
-        for (int i = 0; i < numFields(); i ++) {
-            td_items.add(new TDItem(types[i], names[i]));
-        }
         return td_items.listIterator();
     }
 
     private static final long serialVersionUID = 1L;
-    private Type[] types;
-    private String[] names;
+    private ArrayList<TDItem> td_items;
 
     /**
      * Create a new TupleDesc with typeAr.length fields with fields of the
@@ -64,22 +59,24 @@ public class TupleDesc implements Serializable {
      *            be null.
      */
     public TupleDesc(Type[] typeAr, String[] fieldAr) {
-        this.types = typeAr;
-        this.names = new String[types.length];
+        td_items = new ArrayList<TDItem>();
+        // If no names are given, initiate all names as ""
         if (fieldAr == null) {
             for (int i = 0; i < typeAr.length; i++) {
-                this.names[i] = "";
+                td_items.add(new TDItem(typeAr[i], ""));
             }
         } else {
             for (int i = 0; i < fieldAr.length; i++) {
+                // If fieldAr contains null elements, initiate name as "", else initate normally
                 if (fieldAr[i] == null) {
-                    this.names[i] = "";
+                    td_items.add(new TDItem(typeAr[i], ""));
                 } else {
-                    this.names[i] = fieldAr[i];
+                    td_items.add(new TDItem(typeAr[i], fieldAr[i]));
                 }
             }
+            // If fieldAr has fewer elements than typeAr
             for (int i = fieldAr.length; i < typeAr.length; i++) {
-                this.names[i] = "";
+                td_items.add(new TDItem(typeAr[i], ""));
             }
         }
     }
@@ -93,10 +90,9 @@ public class TupleDesc implements Serializable {
      *            TupleDesc. It must contain at least one entry.
      */
     public TupleDesc(Type[] typeAr) {
-        this.types = typeAr;
-        this.names = new String[types.length];
-        for (int i = 0; i < names.length; i++) {
-            this.names[i] = "";
+        td_items = new ArrayList<TDItem>();
+        for (int i = 0; i < typeAr.length; i++) {
+            td_items.add(new TDItem(typeAr[i], ""));
         }
     }
 
@@ -105,7 +101,7 @@ public class TupleDesc implements Serializable {
      * @return the number of fields in this TupleDesc
      */
     public int numFields() {
-        return types.length;
+        return td_items.size();
     }
 
     /**
@@ -121,7 +117,7 @@ public class TupleDesc implements Serializable {
         if (i >= numFields()) {
             throw new NoSuchElementException();
         }
-        return names[i];
+        return td_items.get(i).fieldName;
     }
 
     /**
@@ -138,7 +134,7 @@ public class TupleDesc implements Serializable {
         if (i >= numFields()) {
             throw new NoSuchElementException();
         }
-        return types[i];
+        return td_items.get(i).fieldType;
     }
 
     /**
@@ -151,8 +147,8 @@ public class TupleDesc implements Serializable {
      *             if no field with a matching name is found.
      */
     public int fieldNameToIndex(String name) throws NoSuchElementException {
-        for (int i = 0; i < names.length; i++) {
-            if (names[i].equals(name)) {
+        for (int i = 0; i < td_items.size(); i++) {
+            if (getFieldName(i).equals(name)) {
                 return i;
             }
         }
@@ -165,7 +161,8 @@ public class TupleDesc implements Serializable {
      */
     public int getSize() {
         int size = 0;
-        for (Type t : types) {
+        for (int i = 0; i < td_items.size(); i++) {
+            Type t = getFieldType(i);
             size += t.getLen();
         }
         return size;
@@ -242,10 +239,10 @@ public class TupleDesc implements Serializable {
      */
     public String toString() {
         String str = "";
-        for (int i = 0; i < types.length; i++) {
-            str += types[i];
+        for (int i = 0; i < td_items.size(); i++) {
+            str += td_items.get(i).fieldType;
             str += "[" + i + "](";
-            str += names[i];
+            str += td_items.get(i).fieldName;
             str += "[" + i + "]), ";
         }
         return str.substring(0, str.length() - 2);
